@@ -1,11 +1,19 @@
-<?php
+<?php 
 
-namespace App\Controllers;
+    namespace App\Controllers;
 
-class Home extends BaseController
-{
-    public function index()
-    {
-        return view('welcome_message');
+    use App\Controllers\BaseController;
+    use App\Controllers\Auth;
+
+
+    class home extends BaseController{
+
+        public function index(){
+            $auth = new Auth();
+            return $auth -> getIndex();
+        }
+
+        public function getSecond(){
+            echo 'second here...';
+        }
     }
-}
