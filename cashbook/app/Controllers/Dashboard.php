@@ -1,41 +1,38 @@
 <?php
 
-    namespace App\Controllers;
+namespace App\Controllers;
 
-    use App\Controllers\BaseController;
-    use App\Models\UserModel;
+use App\Controllers\BaseController;
+use App\Models\UserModel;
 
+class Dashboard extends BaseController
+{
+    public function index()
+    {
 
-    class Dashboard extends BaseController{
+        $userModel = new UserModel();
+        $loggedInUserId = session()->get('loggedInUser');
+        $userInfo = $userModel->find($loggedInUserId);
 
-        public function index(){
+        $servername = "localhost";
+        $database = "livro_caixa";
+        $username = "root";
+        $password = "";
+        
+        $conexao = mysqli_connect($servername, $username, $password, $database);
 
-            $userModel = new UserModel();
-            $loggedInUserId = session() -> get('loggedInUser');
-            $userInfo = $userModel -> find($loggedInUserId);
+        $sql="SELECT distinct date, 
+        (SELECT sum(value) from moviment where type='input' and date=m.date) AS input,
+        (SELECT sum(value) from moviment where type='output' and date=m.date) AS output 
+        FROM moviment m";
+        $retorno = mysqli_query($conexao, $sql);
 
-            $servename = "localhost";
-            $database = "livro_caixa";
-            $username = "root";
-            $password = "";
+        $data = [
+            'title' => 'Dashboard',
+            'userInfo' => $userInfo,
+            'retorno' => $retorno
+        ];
 
-            $conexao = mysqli_connect($servename, $username, $password, $database);
-
-            $sql = "SELECT distnct date,
-            (SELECT sum(value) from moviment where type='input' and date=m.date) AS input,
-            (SELECT sum(value) from moviment where type='output' and date=m.date) AS output 
-            FROM moviment m";
-
-            $retorno = mysqli_query($conexao, $sql);
-
-            $data = [
-                'title' => 'Dashboard',
-                'userInfo' => $userInfo,
-                'retorno' => $retorno
-            ];
-
-            return view('dashboard/index', $data);
-
-        }
-
+        return view('dashboard/index', $data);
     }
+}
